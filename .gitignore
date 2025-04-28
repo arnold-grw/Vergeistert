@@ -1,0 +1,19 @@
+# ========== Ausschlüsse für Unity ==========
+Library/
+Temp/
+Obj/
+Build/
+Builds/
+Logs/
+
+# ========== Benutzer-/IDE-Dateien ==========
+UserSettings/
+.vscode/
+*.csproj
+*.sln
+*.user
+*.unityproj
+
+# ========== Systemdateien ==========
+.DS_Store
+Thumbs.db
