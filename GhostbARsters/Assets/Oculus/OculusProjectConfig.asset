@@ -27,7 +27,7 @@ MonoBehaviour:
   virtualKeyboardSupport: 0
   colocationSessionSupport: 0
   sceneSupport: 2
-  boundaryVisibilitySupport: 0
+  boundaryVisibilitySupport: 1
   disableBackups: 1
   enableNSCConfig: 1
   securityXmlPath: 
@@ -36,7 +36,7 @@ MonoBehaviour:
   targetHorizonOsSdkVersion: 74
   skipUnneededShaders: 0
   enableIL2CPPLTO: 0
-  removeGradleManifest: 1
+  removeGradleManifest: 0
   focusAware: 1
   requiresSystemKeyboard: 0
   experimentalFeaturesEnabled: 0

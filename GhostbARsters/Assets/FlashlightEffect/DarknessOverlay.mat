@@ -69,12 +69,12 @@ Material:
     - _GlossMapScale: 1
     - _Glossiness: 0.5
     - _GlossyReflections: 1
-    - _HoleFeather: 0
-    - _HoleSize: 0.2
+    - _HoleFeather: -0.5
+    - _HoleSize: 0.175
     - _Metallic: 0
     - _Mode: 3
     - _OcclusionStrength: 1
-    - _OverlayAlpha: 0.98
+    - _OverlayAlpha: 0.995
     - _Parallax: 0.02
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
@@ -84,6 +84,6 @@ Material:
     m_Colors:
     - _Color: {r: 0, g: 0, b: 0, a: 0.5882353}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
-    - _HolePosition: {r: 0.49819243, g: 0.47804695, b: 0, a: 0}
+    - _HolePosition: {r: 0.49947706, g: 0.49381405, b: 0, a: 0}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
