@@ -1,66 +1,120 @@
 using UnityEngine;
+using System.Collections.Generic;
 
-public class GhostBehavior : MonoBehaviour
+public class GhostBehaviour : MonoBehaviour
 {
-    public Transform target; 
-    public float maxSpeed = 1f;
-    //public float brakeDistance = 3f;
+    public Transform target; // Spieler oder Zielobjekt
+    public static List<GhostBehaviour> allGhosts = new List<GhostBehaviour>();
+
+    public float health = 10f;
+
+    public float maxSpeed =0.5f;
     public float maxBackoff = 5f;
     public float minBackoff = 0.5f;
+
     private float currentBackoffDistance = 0.5f;
     private float currentSpeed = 0f;
-    private float velocity = 0f;
 
     void Start()
     {
         currentBackoffDistance = minBackoff;
+        allGhosts.Add(this);
+    }
+
+    void OnDestroy()
+    {
+        allGhosts.Remove(this);
     }
 
     void Update()
     {
-        Vector3 diff = target.position - transform.position;
-        diff.y = 0; // Nur horizontale Bewegung
+        if (target == null) return;
 
-        // Drehe den Geist zum Spieler hin
-        if (diff != Vector3.zero)
+        // Richtung und Abstand zum Ziel
+        Vector3 toTarget = target.position - transform.position;
+        toTarget.y = 0;
+        float distanceToTarget = toTarget.magnitude;
+        Vector3 directionToTarget = toTarget.normalized;
+
+        // Zielgeschwindigkeit
+        float targetSpeed = (distanceToTarget > currentBackoffDistance) ? maxSpeed : -maxSpeed;
+        currentSpeed = Mathf.Lerp(currentSpeed, targetSpeed, 2f * Time.deltaTime);
+
+        // Bewegung: weg oder zum Ziel
+        Vector3 baseMove = (currentSpeed >= 0) ? directionToTarget : -directionToTarget;
+
+        // Abstoßungskraft
+        Vector3 separationForce = Vector3.zero;
+        float avoidanceRadius = 1.0f;
+        float totalWeight = 0f;
+
+        foreach (GhostBehaviour other in allGhosts)
         {
-            Quaternion targetRotation = Quaternion.LookRotation(diff);
+            if (other != this)
+            {
+                Vector3 offset = transform.position - other.transform.position;
+                offset.y = 0;
+                float dist = offset.magnitude;
+
+                if (dist < avoidanceRadius && dist > 0.01f)
+                {
+                    float weight = (avoidanceRadius - dist) / avoidanceRadius;
+                    separationForce += offset.normalized * weight;
+                    totalWeight += weight;
+                }
+            }
+        }
+
+        // Durchschnittliche Abstoßung
+        if (totalWeight > 0)
+        {
+            separationForce /= totalWeight;
+        }
+
+        // Kombinierte Bewegungsrichtung
+        Vector3 moveDirection = baseMove + separationForce * 1.5f;
+        moveDirection.y = 0;
+
+        if (moveDirection != Vector3.zero)
+        {
+            moveDirection.Normalize();
+            transform.position += moveDirection * Mathf.Abs(currentSpeed) * Time.deltaTime;
+        }
+
+        // Blickrichtung (nur zum Spieler, nicht durch Abstoßung gestört)
+        if (directionToTarget != Vector3.zero)
+        {
+            Quaternion targetRotation = Quaternion.LookRotation(directionToTarget);
             transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * 2f);
         }
-
-        float distance = diff.magnitude;
-        float targetSpeed = 0f;
-
-        // Bestimme Zielgeschwindigkeit
-        if (distance > currentBackoffDistance)
-        {
-            targetSpeed = maxSpeed;
-        }
-        if (distance < currentBackoffDistance)
-        {
-            targetSpeed = -maxSpeed/2;
-        }
-
-        // Smoothes Anpassen der Geschwindigkeit
-        currentSpeed = Mathf.Lerp(currentSpeed, targetSpeed, 2f * Time.deltaTime);
-        //currentSpeed = targetSpeed;
-        // Bewegung
-        transform.position += transform.forward * currentSpeed * Time.deltaTime;
     }
 
 
     void OnTriggerEnter(Collider other)
     {
-        if (other.gameObject.name == "ConeMesh") // Oder vergleiche mit Tag etc.
+        if (other.gameObject.name == "ConeMesh") // oder per Tag prüfen
         {
             currentBackoffDistance = maxBackoff;
         }
     }
+
     void OnTriggerExit(Collider other)
     {
-        if (other.gameObject.name == "ConeMesh") // Oder vergleiche mit Tag etc.
+        if (other.gameObject.name == "ConeMesh")
         {
             currentBackoffDistance = minBackoff;
         }
+    }
+
+    public void TakeDamage(float damage){
+        this.health -= damage;
+        if (health <= 0)
+        {
+            DestroyGhost();
+        }
+    }
+
+    void DestroyGhost(){
+        Destroy(gameObject);
     }
 }
