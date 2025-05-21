@@ -7,7 +7,7 @@ public class PhysicsObject : MonoBehaviour
         Rigidbody rb = GetComponent<Rigidbody>();
         if (rb != null)
         {
-            Vector3 impact = (direction.normalized + new Vector3(0f, 0.25f, 0f)) * force;
+            Vector3 impact = (direction.normalized * force + new Vector3(0f, 0.25f, 0f));
             rb.AddForce(impact, ForceMode.Impulse);
         }
     }

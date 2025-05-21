@@ -4,7 +4,7 @@ using Unity.XR.Oculus;
 
 public class FlashlightGun : MonoBehaviour
 {
-    public float energy = 100;
+    public float energy = 100f;
     public LayerMask obstacleLayers;
 
     public AudioClip shot_audio;

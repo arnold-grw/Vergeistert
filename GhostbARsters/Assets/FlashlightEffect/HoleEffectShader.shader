@@ -17,6 +17,7 @@ Shader "Unlit/FlashlightHoleShader"
         {
             Blend SrcAlpha OneMinusSrcAlpha
             ZWrite Off
+            ZTest Always
             CGPROGRAM
             #pragma vertex vert
             #pragma fragment frag

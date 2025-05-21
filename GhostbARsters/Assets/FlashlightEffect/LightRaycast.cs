@@ -7,6 +7,7 @@ public class LightRaycast : MonoBehaviour
     public float maxDistance = 5f;
     public float smoothSpeed = 5f; // Glättungsgeschwindigkeit
     public LayerMask obstacleLayers;
+    public SphereController sphere;
 
     private Vector3 initialLocalPosition;
     private Vector3 targetLocalPosition;
@@ -30,11 +31,13 @@ public class LightRaycast : MonoBehaviour
         if (Physics.Raycast(origin, direction, out RaycastHit hit, maxDistance, obstacleLayers))
         {
             // Zielentfernung innerhalb min/max clampen
-            targetDistance = Mathf.Clamp(hit.distance, minDistance, maxDistance);
+            targetDistance = Mathf.Clamp(hit.distance, minDistance, maxDistance) * 100f;
         }
+        sphere.setSize(Mathf.Clamp(targetDistance/500f + 0.1f, 0.1f, 0.45f));
 
         // Zielposition in lokalen Koordinaten berechnen
         targetLocalPosition = initialLocalPosition + Vector3.forward * targetDistance;
+        //Debug.Log(targetLocalPosition);
 
         // Weiche Bewegung zur Zielposition
         transform.localPosition = Vector3.Lerp(transform.localPosition, targetLocalPosition, Time.deltaTime * smoothSpeed);
