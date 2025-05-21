@@ -37,7 +37,7 @@ public class GhostBehaviour : MonoBehaviour
         Vector3 directionToTarget = toTarget.normalized;
 
         // Zielgeschwindigkeit
-        float targetSpeed = (distanceToTarget > currentBackoffDistance) ? maxSpeed : -maxSpeed;
+        float targetSpeed = (distanceToTarget > currentBackoffDistance) ? maxSpeed : -maxSpeed/2;
         currentSpeed = Mathf.Lerp(currentSpeed, targetSpeed, 2f * Time.deltaTime);
 
         // Bewegung: weg oder zum Ziel
