@@ -45,10 +45,10 @@ public class FlashlightGun : MonoBehaviour
         Vector3 direction = transform.forward;
         if (Physics.Raycast(origin, direction, out RaycastHit hit, 20f, obstacleLayers))
         {
-            GhostBehaviour ghost = hit.collider.GetComponent<GhostBehaviour>();
-            if (ghost != null)
+            Ghost g = hit.collider.GetComponent<Ghost>();
+            if (g != null)
             {
-                ghost.TakeDamage(2f);
+                g.TakeDamage(2f);
             }
 
             PhysicsObject po = hit.collider.GetComponent<PhysicsObject>();

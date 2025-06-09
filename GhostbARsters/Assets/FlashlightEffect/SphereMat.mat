@@ -78,7 +78,7 @@ Material:
     - _OcclusionStrength: 1
     - _OverlayAlpha: 0.97
     - _Parallax: 0.02
-    - _Smoothness: 0.3
+    - _Smoothness: 0.30000004
     - _SmoothnessTextureChannel: 0
     - _SpecularHighlights: 1
     - _SrcBlend: 1

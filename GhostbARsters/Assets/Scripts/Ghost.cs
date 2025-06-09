@@ -1,10 +1,10 @@
 using UnityEngine;
 using System.Collections.Generic;
 
-public class GhostBehaviour : MonoBehaviour
+public class Ghost : MonoBehaviour
 {
     public Transform target; // Spieler oder Zielobjekt
-    public static List<GhostBehaviour> allGhosts = new List<GhostBehaviour>();
+    public static List<Ghost> allGhosts = new List<Ghost>();
 
     public float health = 10f;
 
@@ -19,6 +19,11 @@ public class GhostBehaviour : MonoBehaviour
     {
         currentBackoffDistance = minBackoff;
         allGhosts.Add(this);
+    }
+
+    public void setTarget(Transform t)
+    {
+        this.target = t;
     }
 
     void OnDestroy()
@@ -37,7 +42,7 @@ public class GhostBehaviour : MonoBehaviour
         Vector3 directionToTarget = toTarget.normalized;
 
         // Zielgeschwindigkeit
-        float targetSpeed = (distanceToTarget > currentBackoffDistance) ? maxSpeed : -maxSpeed/2;
+        float targetSpeed = (distanceToTarget > currentBackoffDistance) ? maxSpeed : maxSpeed/3;
         currentSpeed = Mathf.Lerp(currentSpeed, targetSpeed, 2f * Time.deltaTime);
 
         // Bewegung: weg oder zum Ziel
@@ -48,7 +53,7 @@ public class GhostBehaviour : MonoBehaviour
         float avoidanceRadius = 1.0f;
         float totalWeight = 0f;
 
-        foreach (GhostBehaviour other in allGhosts)
+        foreach (Ghost other in allGhosts)
         {
             if (other != this)
             {
