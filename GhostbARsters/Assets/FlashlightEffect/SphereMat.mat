@@ -88,6 +88,6 @@ Material:
     - _Color: {r: 0, g: 0, b: 0, a: 0.5882353}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _HolePosition: {r: 0.49752972, g: 0.4746184, b: 0, a: 0}
-    - _LightDir: {r: -0.003643475, g: 0.0066185487, b: 0.99997145, a: 0}
+    - _LightDir: {r: -0.004701502, g: 0.008540506, b: 0.99995244, a: 0}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
