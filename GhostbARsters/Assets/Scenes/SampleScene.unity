@@ -4399,9 +4399,9 @@ MonoBehaviour:
   ghostPrefab: {fileID: 7929489446097885603, guid: 87fb8a5a11903e24eac8ba48699316e3, type: 3}
   player: {fileID: 1481512919}
   spawnRadius: 5
-  startDelay: 10
-  startRate: 20
-  endRate: 5
+  startDelay: 1
+  startRate: 5
+  endRate: 10
   duration: 180
 --- !u!4 &563316321
 Transform:
@@ -8316,7 +8316,7 @@ MonoBehaviour:
   mushroomPrefab: {fileID: 7013999281132056100, guid: 9c4d66937befb7147a670cbc666830f3, type: 3}
   spawnRadius: 4
   startDelay: 1
-  spawnRate: 1
+  spawnRate: 3
 --- !u!4 &1051685240
 Transform:
   m_ObjectHideFlags: 0

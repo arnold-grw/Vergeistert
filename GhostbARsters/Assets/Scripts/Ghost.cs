@@ -1,10 +1,12 @@
 using UnityEngine;
+using System.Collections;
 using System.Collections.Generic;
 
 public class Ghost : MonoBehaviour
 {
     public Transform target; // Spieler oder Zielobjekt
     public static List<Ghost> allGhosts = new List<Ghost>();
+    public GhostRenderer ghostRenderer;
 
     public float health = 10f;
 
@@ -19,6 +21,8 @@ public class Ghost : MonoBehaviour
     {
         currentBackoffDistance = minBackoff;
         allGhosts.Add(this);
+
+        StartCoroutine(DestroyGhost());
     }
 
     public void setTarget(Transform t)
@@ -115,11 +119,16 @@ public class Ghost : MonoBehaviour
         this.health -= damage;
         if (health <= 0)
         {
-            DestroyGhost();
+            StartCoroutine(DestroyGhost());
         }
     }
 
-    void DestroyGhost(){
+    IEnumerator DestroyGhost()
+    {
+        float duration = 5f; // Fade-Zeit
+        ghostRenderer.Dissolve(duration);
+        yield return new WaitForSeconds(duration);
+
         Destroy(gameObject);
     }
 }
