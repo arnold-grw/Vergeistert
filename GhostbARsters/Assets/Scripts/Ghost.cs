@@ -21,8 +21,6 @@ public class Ghost : MonoBehaviour
     {
         currentBackoffDistance = minBackoff;
         allGhosts.Add(this);
-
-        StartCoroutine(DestroyGhost());
     }
 
     public void setTarget(Transform t)
@@ -46,7 +44,7 @@ public class Ghost : MonoBehaviour
         Vector3 directionToTarget = toTarget.normalized;
 
         // Zielgeschwindigkeit
-        float targetSpeed = (distanceToTarget > currentBackoffDistance) ? maxSpeed : maxSpeed/3;
+        float targetSpeed = (distanceToTarget > currentBackoffDistance) ? maxSpeed : maxSpeed/10;
         currentSpeed = Mathf.Lerp(currentSpeed, targetSpeed, 2f * Time.deltaTime);
 
         // Bewegung: weg oder zum Ziel
@@ -125,7 +123,7 @@ public class Ghost : MonoBehaviour
 
     IEnumerator DestroyGhost()
     {
-        float duration = 5f; // Fade-Zeit
+        float duration = 1f; // Fade-Zeit
         ghostRenderer.Dissolve(duration);
         yield return new WaitForSeconds(duration);
 

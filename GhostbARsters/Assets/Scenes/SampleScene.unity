@@ -1191,8 +1191,8 @@ Transform:
   m_GameObject: {fileID: 158757685}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: -0.01, z: 0}
-  m_LocalScale: {x: 10, y: 10, z: 10}
+  m_LocalPosition: {x: 0, y: -0.02, z: 0}
+  m_LocalScale: {x: 2, y: 2, z: 2}
   m_ConstrainProportionsScale: 0
   m_Children: []
   m_Father: {fileID: 0}
@@ -8314,7 +8314,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   mushroomPrefab: {fileID: 7013999281132056100, guid: 9c4d66937befb7147a670cbc666830f3, type: 3}
-  spawnRadius: 4
+  spawnRadius: 3
   startDelay: 1
   spawnRate: 3
 --- !u!4 &1051685240

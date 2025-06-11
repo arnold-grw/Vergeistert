@@ -44,6 +44,6 @@ public class GhostRenderer : MonoBehaviour
             yield return null;
         }
 
-        Destroy(gameObject);
+        //Destroy(gameObject);
     }
 }

@@ -76,7 +76,7 @@ Material:
     - _Metallic: 0
     - _Mode: 3
     - _OcclusionStrength: 1
-    - _OverlayAlpha: 0.97
+    - _OverlayAlpha: 0.99
     - _Parallax: 0.02
     - _Smoothness: 0.45
     - _SmoothnessTextureChannel: 0
@@ -88,6 +88,6 @@ Material:
     - _Color: {r: 0, g: 0, b: 0, a: 0.5882353}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
     - _HolePosition: {r: 0.49752972, g: 0.4746184, b: 0, a: 0}
-    - _LightDir: {r: -0.004701502, g: 0.008540506, b: 0.99995244, a: 0}
+    - _LightDir: {r: -0.0047255927, g: 0.008584267, b: 0.99995196, a: 0}
   m_BuildTextureStacks: []
   m_AllowLocking: 1
