@@ -50,7 +50,9 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   target: {fileID: 0}
   ghostRenderer: {fileID: 1957728776697157857}
-  health: 6
+  maxHealth: 10
+  minHealth: 2.5
+  health: 10
   maxSpeed: 0.33
   maxBackoff: 5
   minBackoff: 0.5

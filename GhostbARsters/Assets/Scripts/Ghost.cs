@@ -8,9 +8,11 @@ public class Ghost : MonoBehaviour
     public static List<Ghost> allGhosts = new List<Ghost>();
     public GhostRenderer ghostRenderer;
 
-    public float health = 10f;
+    public float maxHealth = 10f;
+    public float minHealth = 2f;
+    public float health;
 
-    public float maxSpeed =0.5f;
+    public float maxSpeed = 0.5f;
     public float maxBackoff = 5f;
     public float minBackoff = 0.5f;
 
@@ -19,6 +21,7 @@ public class Ghost : MonoBehaviour
 
     void Start()
     {
+        health = minHealth;
         currentBackoffDistance = minBackoff;
         allGhosts.Add(this);
     }
@@ -35,6 +38,9 @@ public class Ghost : MonoBehaviour
 
     void Update()
     {
+
+        UpdateHealth();
+
         if (target == null) return;
 
         // Richtung und Abstand zum Ziel
@@ -113,20 +119,25 @@ public class Ghost : MonoBehaviour
         }
     }
 
-    public void TakeDamage(float damage){
-        this.health -= damage;
-        if (health <= 0)
+    void UpdateHealth()
+    {
+        ghostRenderer.SetDissolveAmount(1f - (health / maxHealth));
+        if (health < minHealth)
         {
-            StartCoroutine(DestroyGhost());
+            Destroy(gameObject);
+        }
+        
+        //heal
+        this.health += 2f*Time.deltaTime;
+        if (health > maxHealth)
+        {
+            health = maxHealth;
         }
     }
 
-    IEnumerator DestroyGhost()
+    public void TakeDamage(float damage)
     {
-        float duration = 1f; // Fade-Zeit
-        ghostRenderer.Dissolve(duration);
-        yield return new WaitForSeconds(duration);
-
-        Destroy(gameObject);
+        Debug.Log("ouch");
+        this.health -= damage;
     }
 }

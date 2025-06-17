@@ -7,48 +7,70 @@ public class FlashlightGun : MonoBehaviour
     public float energy = 100f;
     public LayerMask obstacleLayers;
 
-    public AudioClip shot_audio;
+    public AudioClip shotAudio;
+    public ParticleSystem shootEffect;
+
+    public float fireRate = 0.1f; // 10 Schüsse pro Sekunde
 
     private InputAction shootAction;
+    private bool isShooting = false;
+    private float nextShotTime = 0f;
 
     void Awake()
     {
-        // Neue InputAction für linke Maustaste
         shootAction = new InputAction(type: InputActionType.Button, binding: "<Mouse>/leftButton");
         shootAction.Enable();
     }
 
-    void Start()
-    {
-
-    }
-
     void Update()
     {
-        if (OVRInput.GetDown(OVRInput.Button.PrimaryIndexTrigger, OVRInput.Controller.RTouch))
-        {
-            Shoot();
-        }
+        // Eingabe prüfen
+        bool triggerHeld = OVRInput.Get(OVRInput.Button.PrimaryIndexTrigger, OVRInput.Controller.RTouch) ||
+                           shootAction.IsPressed();
 
-        if (shootAction.WasPressedThisFrame())
+        if (triggerHeld)
         {
-            Shoot();
+            isShooting = true;
+
+            if (Time.time >= nextShotTime)
+            {
+                nextShotTime = Time.time + fireRate;
+                Shoot();
+            }
+
+            // Partikeleffekt starten, falls nicht schon aktiv
+            if (shootEffect != null && !shootEffect.isPlaying)
+            {
+                shootEffect.Play();
+            }
+        }
+        else
+        {
+            isShooting = false;
+
+            // Partikeleffekt stoppen
+            if (shootEffect != null && shootEffect.isPlaying)
+            {
+                shootEffect.Stop();
+            }
         }
     }
 
     void Shoot()
     {
-        energy -= 5;
-        PlayAudio(shot_audio);
+        //if (energy <= 0f) return;
+        //energy -= 5;
+        //PlayAudio(shotAudio);
 
         Vector3 origin = transform.position;
         Vector3 direction = transform.forward;
+
         if (Physics.Raycast(origin, direction, out RaycastHit hit, 20f, obstacleLayers))
         {
             Ghost g = hit.collider.GetComponent<Ghost>();
             if (g != null)
             {
-                g.TakeDamage(2f);
+                g.TakeDamage(1.0f);
             }
 
             PhysicsObject po = hit.collider.GetComponent<PhysicsObject>();
@@ -60,16 +82,16 @@ public class FlashlightGun : MonoBehaviour
     }
 
     void PlayAudio(AudioClip clip)
-{
-    if (clip == null) return;
+    {
+        if (clip == null) return;
 
-    GameObject tempAudio = new GameObject("TempAudio");
-    tempAudio.transform.position = transform.position;
+        GameObject tempAudio = new GameObject("TempAudio");
+        tempAudio.transform.position = transform.position;
 
-    AudioSource audioSource = tempAudio.AddComponent<AudioSource>();
-    audioSource.clip = clip;
-    audioSource.Play();
+        AudioSource audioSource = tempAudio.AddComponent<AudioSource>();
+        audioSource.clip = clip;
+        audioSource.Play();
 
-    Destroy(tempAudio, clip.length);
-}
+        Destroy(tempAudio, clip.length);
+    }
 }

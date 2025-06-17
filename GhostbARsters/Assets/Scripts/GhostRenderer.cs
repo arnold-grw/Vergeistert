@@ -1,16 +1,14 @@
 using UnityEngine;
-using System.Collections;
 
 public class GhostRenderer : MonoBehaviour
 {
-    Material[] dissolveMaterials;
+    private Material[] dissolveMaterials;
 
-    public void Dissolve(float duration)
+    void Awake()
     {
         SkinnedMeshRenderer renderer = GetComponentInChildren<SkinnedMeshRenderer>();
         if (renderer != null)
         {
-            // Klone alle Materialien individuell
             Material[] originalMats = renderer.materials;
             dissolveMaterials = new Material[originalMats.Length];
 
@@ -19,31 +17,22 @@ public class GhostRenderer : MonoBehaviour
                 dissolveMaterials[i] = new Material(originalMats[i]);
             }
 
-            // Setze die neuen Materials im Renderer
             renderer.materials = dissolveMaterials;
         }
 
-        StartCoroutine(DissolveAndDestroy(duration));
+        SetDissolveAmount(1.0f);
     }
 
-    IEnumerator DissolveAndDestroy(float duration)
+    public void SetDissolveAmount(float dissolve)
     {
-        float elapsed = 0f;
+        if (dissolveMaterials == null) return;
 
-        while (elapsed < duration)
+        foreach (Material mat in dissolveMaterials)
         {
-            float dissolve = Mathf.Lerp(0f, 1f, elapsed / duration);
-
-            foreach (Material mat in dissolveMaterials)
+            if (mat != null)
             {
-                if (mat != null)
-                    mat.SetFloat("_DissolveAmount", dissolve);
+                mat.SetFloat("_DissolveAmount", dissolve);
             }
-
-            elapsed += Time.deltaTime;
-            yield return null;
         }
-
-        //Destroy(gameObject);
     }
 }

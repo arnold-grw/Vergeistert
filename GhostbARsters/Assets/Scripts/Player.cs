@@ -7,11 +7,13 @@ public class Player : MonoBehaviour
     void Update()
     {
         // Y-Position in Weltkoordinaten fixieren
+        /*
         Vector3 worldPos = transform.position;
         if (worldPos.y != 0f)
         {
             transform.position = new Vector3(worldPos.x, 0f, worldPos.z);
         }
+        */
     }
 
     public void takeDamage(float damage)
