@@ -4,6 +4,7 @@ using UnityEngine;
 public class MushroomSpawner : MonoBehaviour
 {
     public GameObject mushroomPrefab;
+    public GameObject playerMouth;
 
     public float spawnRadius = 5f;
     public float startDelay = 10f;
@@ -41,5 +42,8 @@ public class MushroomSpawner : MonoBehaviour
 
         //Zugriff auf Mushroom-Script
         Mushroom mushroomScript = mushroomInstance.GetComponent<Mushroom>();
+        mushroomScript.mouth = this.playerMouth;
+        int randomValue = Random.Range(0, 2);
+        mushroomScript.SetType(randomValue);
     }
 }
