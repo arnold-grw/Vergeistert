@@ -44,7 +44,7 @@ public class Mushroom : MonoBehaviour
         }
         else
         {
-            if (Vector3.Distance(transform.position, mouth.transform.position) < 0.1f)
+            if (Vector3.Distance(transform.position, mouth.transform.position) < 0.175f)
             {
                 AudioSource munchSound = mouth.GetComponent<AudioSource>();
                 if (munchSound != null) { munchSound.Play(); }
