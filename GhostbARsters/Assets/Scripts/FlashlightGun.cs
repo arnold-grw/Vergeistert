@@ -7,7 +7,7 @@ public class FlashlightGun : MonoBehaviour
     public float energy = 100f;
     public LayerMask obstacleLayers;
 
-    public AudioClip shotAudio;
+    public AudioSource shootAudioSource;
     public ParticleSystem shootEffect;
 
     public float fireRate = 0.1f; // 10 Schüsse pro Sekunde
@@ -27,9 +27,12 @@ public class FlashlightGun : MonoBehaviour
         // Eingabe prüfen
         bool triggerHeld = OVRInput.Get(OVRInput.Button.PrimaryIndexTrigger, OVRInput.Controller.RTouch) ||
                            shootAction.IsPressed();
-
         if (triggerHeld)
         {
+            if (shootAudioSource != null && !shootAudioSource.isPlaying)
+            {
+                shootAudioSource.Play();
+            }
             isShooting = true;
 
             if (Time.time >= nextShotTime)
@@ -52,6 +55,7 @@ public class FlashlightGun : MonoBehaviour
             if (shootEffect != null && shootEffect.isPlaying)
             {
                 shootEffect.Stop();
+                shootAudioSource.Stop();
             }
         }
     }
@@ -81,17 +85,4 @@ public class FlashlightGun : MonoBehaviour
         }
     }
 
-    void PlayAudio(AudioClip clip)
-    {
-        if (clip == null) return;
-
-        GameObject tempAudio = new GameObject("TempAudio");
-        tempAudio.transform.position = transform.position;
-
-        AudioSource audioSource = tempAudio.AddComponent<AudioSource>();
-        audioSource.clip = clip;
-        audioSource.Play();
-
-        Destroy(tempAudio, clip.length);
-    }
 }
