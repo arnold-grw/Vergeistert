@@ -4,7 +4,7 @@ using Unity.XR.Oculus;
 
 public class FlashlightGun : MonoBehaviour
 {
-    public float energy = 100f;
+    public float energy = 100;
     public LayerMask obstacleLayers;
 
     public AudioSource shootAudioSource;
@@ -29,42 +29,25 @@ public class FlashlightGun : MonoBehaviour
                            shootAction.IsPressed();
         if (triggerHeld)
         {
-            if (shootAudioSource != null && !shootAudioSource.isPlaying)
+            if (energy > 0f)
             {
-                shootAudioSource.Play();
+                StartShooting();
             }
-            isShooting = true;
-
-            if (Time.time >= nextShotTime)
+            else
             {
-                nextShotTime = Time.time + fireRate;
-                Shoot();
+                StopShooting();
             }
 
-            // Partikeleffekt starten, falls nicht schon aktiv
-            if (shootEffect != null && !shootEffect.isPlaying)
-            {
-                shootEffect.Play();
-            }
         }
         else
         {
-            isShooting = false;
-
-            // Partikeleffekt stoppen
-            if (shootEffect != null && shootEffect.isPlaying)
-            {
-                shootEffect.Stop();
-                shootAudioSource.Stop();
-            }
+            StopShooting();
         }
     }
 
     void Shoot()
     {
-        //if (energy <= 0f) return;
-        //energy -= 5;
-        //PlayAudio(shotAudio);
+        energy -= 2;
 
         Vector3 origin = transform.position;
         Vector3 direction = transform.forward;
@@ -82,6 +65,45 @@ public class FlashlightGun : MonoBehaviour
             {
                 po.applyImpact(direction, 4f);
             }
+        }
+    }
+
+    void StartShooting()
+    {
+        if (shootAudioSource != null && !shootAudioSource.isPlaying)
+        {
+            shootAudioSource.Play();
+        }
+
+        if (Time.time >= nextShotTime)
+        {
+            nextShotTime = Time.time + fireRate;
+            Shoot();
+        }
+
+        // Partikeleffekt starten, falls nicht schon aktiv
+        if (shootEffect != null && !shootEffect.isPlaying)
+        {
+            shootEffect.Play();
+        }
+    }
+
+    void StopShooting()
+    {
+        // Partikeleffekt stoppen
+        if (shootEffect != null && shootEffect.isPlaying)
+        {
+            shootEffect.Stop();
+            //Sound stoppen
+            shootAudioSource.Stop();
+        }
+    }
+
+    public void AddEnergy(float newEnergy)
+    {
+        if (energy < 100)
+        {
+            this.energy += newEnergy;
         }
     }
 

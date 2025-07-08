@@ -6,6 +6,10 @@ public class GhostSpawner : MonoBehaviour
     public GameObject ghostPrefab;
     public Transform player;
 
+    [Header("Sound")]
+    public AudioClip[] spawnSounds;
+
+    [Header("Spawn Settings")]
     public float spawnRadius = 5f;
     public float startDelay = 10f;
     public float startRate = 20f;    // z. B. alle 10 Sekunden am Anfang
@@ -49,5 +53,25 @@ public class GhostSpawner : MonoBehaviour
         {
             ghostScript.setTarget(player);
         }
+
+        PlaySound(spawnPosition);
+    }
+
+    void PlaySound(Vector3 pos)
+    {
+        if (spawnSounds == null || spawnSounds.Length == 0) return;
+
+        AudioClip chosenClip = spawnSounds[Random.Range(0, spawnSounds.Length)];
+        if (chosenClip == null) return;
+
+        GameObject soundObject = new GameObject("TempSound");
+        soundObject.transform.position = pos;
+
+        AudioSource source = soundObject.AddComponent<AudioSource>();
+        source.clip = chosenClip;
+        source.spatialBlend = 1f; // 3D sound
+        source.Play();
+
+        Destroy(soundObject, chosenClip.length);
     }
 }
