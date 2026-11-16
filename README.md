@@ -4,7 +4,11 @@
 
 *Vergeistert* (German for "haunted" / "spooked") was created in the course *Content Design* (summer semester 2025). The Unity project inside this repository is named `GhostbARsters`.
 
-> 🎬 A gameplay recording is available in [`Docs/gameplay.mp4`](Docs/gameplay.mp4).
+<p align="center">
+  <img src="Docs/gameplay_clip.gif" alt="Gameplay clip" />
+</p>
+
+> 🎬 A full gameplay recording is available in [`Docs/gameplay.mp4`](Docs/gameplay.mp4).
 
 ---
 
