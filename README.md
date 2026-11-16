@@ -1,93 +1,159 @@
-# ContentDesignAR
+# Vergeistert
 
+**A mixed-reality horror game for Meta Quest that turns your own darkened room into a haunted arena.**
 
+*Vergeistert* (German for "haunted" / "spooked") was created in the course *Content Design* (summer semester 2025). The Unity project inside this repository is named `GhostbARsters`.
 
-## Getting started
+> 🎬 A gameplay recording is available in [`Docs/gameplay.mp4`](Docs/gameplay.mp4).
 
-To make it easy for you to get started with GitLab, here's a list of recommended next steps.
+---
 
-Already a pro? Just edit this README.md and make it your own. Want to make it easy? [Use the template at the bottom](#editing-this-readme)!
+## Concept
 
-## Add your files
+You stand in your real room, seen through the Quest's passthrough cameras, but the lights are out. A layer of virtual darkness covers everything, and the only thing that cuts through it is the **flashlight in your hand**.
 
-- [ ] [Create](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#create-a-file) or [upload](https://docs.gitlab.com/ee/user/project/repository/web_editor.html#upload-a-file) files
-- [ ] [Add files using the command line](https://docs.gitlab.com/topics/git/add_files/#add-files-to-a-git-repository) or push an existing Git repository with the following command:
+The flashlight is also your **weapon**. Hold the trigger and it fires an electro-shock beam that drives back the **dementor-like ghosts** that keep appearing around you. Ghosts slowly regenerate, and they arrive faster as time goes on, so you can't stand still.
+
+To survive you have to keep moving and collect **mushrooms** that grow out of the floor of your room for a few seconds before sinking back into the ground:
+
+| Mushroom | Effect | How to use it |
+|---|---|---|
+| **Green** | Heals you (+10 HP) | Grab it and bring it to your mouth |
+| **Pink** | Recharges the flashlight (+25 energy) | Grab it and bring it to the flashlight's charger |
+
+You start at 50 of 100 health. Fill your health bar completely to win.
+
+### Core gameplay loop
+
+1. **Light:** point the flashlight to see. Ghosts caught in the light cone back away.
+2. **Shoot:** hold the trigger to fire the beam. Every shot uses energy and makes ghosts dissolve. A ghost that drops below its minimum health vanishes.
+3. **Forage:** find mushrooms on the floor before they despawn, and eat or "feed" them to the flashlight.
+4. **Survive:** ghosts spawn every 20 s at first and every 5 s after three minutes.
+
+---
+
+## Controls
+
+| Action | Meta Quest Touch controllers | Editor / desktop |
+|---|---|---|
+| Aim flashlight | Right controller | – |
+| Fire electro-shock beam | Right index trigger | Left mouse button |
+| Grab mushroom | Grip button (or hand-tracking pinch/grab) | – |
+| Heal | Move a green mushroom to your mouth | – |
+| Recharge | Move a pink mushroom to the flashlight's charger | – |
+
+---
+
+## Technical Overview
+
+### Engine & packages
+
+| | |
+|---|---|
+| **Unity version** | **6000.0.47f1** (Unity 6) |
+| **Render pipeline** | Built-in Render Pipeline |
+| **Target platform** | Android (Meta Quest), ARM64, IL2CPP, Vulkan |
+| **Min / target Android API** | 32 |
+| **Meta XR SDK** | `com.meta.xr.sdk.all` 74.0.3 (Core, Interaction SDK, MR Utility Kit, etc.) |
+| **OpenXR** | `com.unity.xr.openxr` 1.14.3 |
+| **XR Plugin Management** | `com.unity.xr.management` 4.5.1 |
+| **XR Interaction Toolkit** | `com.unity.xr.interaction.toolkit` 3.0.8 |
+| **Input System** | `com.unity.inputsystem` 1.14.0 |
+
+### Project structure
 
 ```
-cd existing_repo
-git remote add origin https://gitlab.gwdg.de/arnold.grunwald/contentdesignar.git
-git branch -M main
-git push -uf origin main
+GhostbARsters/
+└── Assets/
+    ├── Scenes/SampleScene.unity     # The game scene (only scene in the build)
+    ├── Scripts/                     # Gameplay logic
+    ├── FlashlightEffect/            # Darkness overlay, light cone and shaders
+    ├── Prefabs/                     # Ghost.prefab, Mushroom.prefab
+    ├── Models/, Materials/, Sounds/ # Art and audio assets
+    ├── XR/                          # XR Plugin Management and OpenXR settings
+    └── Oculus/, MetaXR/             # Meta XR SDK project configuration
 ```
 
-## Integrate with your tools
+### Scripts
 
-- [ ] [Set up project integrations](https://gitlab.gwdg.de/arnold.grunwald/contentdesignar/-/settings/integrations)
+| Script | Responsibility |
+|---|---|
+| `FlashlightGun.cs` | Reads the right trigger (via `OVRInput`) or the mouse, fires a raycast 10 times per second, damages ghosts, pushes physics objects and handles energy, sound and particle effects. |
+| `Ghost.cs` | Ghost AI: moves toward the player, keeps apart from other ghosts, backs off while inside the light cone, regenerates health and is destroyed below its minimum health. |
+| `GhostRenderer.cs` | Creates per-instance materials and sets the `_DissolveAmount` shader property based on the ghost's health. |
+| `GhostSpawner.cs` | Spawns ghosts on a circle around the player with spatial 3D spawn sounds. The spawn interval drops over time (20 s → 5 s over 180 s). |
+| `Mushroom.cs` | Grows out of the floor, sinks back after its lifetime, picks a type (heal or charge), and gets "sucked into" the mouth or charger when brought close. |
+| `MushroomSpawner.cs` | Spawns mushrooms at random positions within a radius, at a randomised interval. |
+| `Player.cs` | Player health and the win condition. |
+| `GrabManager.cs` | Plays a sound when an XR Interaction Toolkit grab interactable is picked up. |
+| `PhysicsObject.cs` | Applies an impulse when an object is hit by the beam. |
 
-## Collaborate with your team
+### Flashlight & darkness effect
 
-- [ ] [Invite team members and collaborators](https://docs.gitlab.com/ee/user/project/members/)
-- [ ] [Create a new merge request](https://docs.gitlab.com/ee/user/project/merge_requests/creating_merge_requests.html)
-- [ ] [Automatically close issues from merge requests](https://docs.gitlab.com/ee/user/project/issues/managing_issues.html#closing-issues-automatically)
-- [ ] [Enable merge request approvals](https://docs.gitlab.com/ee/user/project/merge_requests/approvals/)
-- [ ] [Set auto-merge](https://docs.gitlab.com/user/project/merge_requests/auto_merge/)
+The horror atmosphere depends on making the real room dark and lighting it only where the player points:
 
-## Test and Deploy
+- **`HoleEffectShader` / `DarknessOverlay.mat`:** a full-screen darkness layer drawn over the passthrough image. A soft "hole" is cut into it in the direction of the flashlight.
+- **`SphereController.cs`:** passes the light direction (`_LightDir`) and edge softness (`_Smoothness`) to the darkness material every frame.
+- **`LightRaycast.cs` / `ConeSize.cs`:** raycast along the flashlight so the light spot and the visible cone mesh (`ConeMesh`) adjust to the distance of the surface being lit.
+- **`LightVolumeGenerator.cs`:** builds a volumetric-looking light beam from stacked quads.
+- The `ConeMesh` collider is also used for gameplay: ghosts inside it switch to a larger back-off distance.
 
-Use the built-in continuous integration in GitLab.
+---
 
-- [ ] [Get started with GitLab CI/CD](https://docs.gitlab.com/ee/ci/quick_start/)
-- [ ] [Analyze your code for known vulnerabilities with Static Application Security Testing (SAST)](https://docs.gitlab.com/ee/user/application_security/sast/)
-- [ ] [Deploy to Kubernetes, Amazon EC2, or Amazon ECS using Auto Deploy](https://docs.gitlab.com/ee/topics/autodevops/requirements.html)
-- [ ] [Use pull-based deployments for improved Kubernetes management](https://docs.gitlab.com/ee/user/clusters/agent/)
-- [ ] [Set up protected environments](https://docs.gitlab.com/ee/ci/environments/protected_environments.html)
+## XR Setup
 
-***
+The project uses the **OVR camera rig from the Meta XR SDK** together with the **Meta Interaction SDK** for hands and controllers.
 
-# Editing this README
+**Scene rig (`SampleScene`):**
+- `Camera Rig` (OVRCameraRig with `TrackingSpace`, eye anchors and hand/controller anchors)
+- `PassthroughBackground`: shows the passthrough camera feed as the background of the scene
+- Interaction SDK rigs for **controllers and hands** (`GrabInteractor`, `HandGrabInteractor`, synthetic hands)
+- `Player` with a `Mouth` child (the target for green mushrooms) and the flashlight with a `Charger` child (the target for pink mushrooms)
+- `GhostSpawner`, `MushroomSpawner`, `XR Interaction Manager`
 
-When you're ready to make this README your own, just edit this file and use the handy template below (or feel free to structure it however you want - this is just a starting point!). Thanks to [makeareadme.com](https://www.makeareadme.com/) for this template.
+**XR Plugin Management (`Assets/XR`):**
 
-## Suggestions for a good README
+| Build target | XR loader | Purpose |
+|---|---|---|
+| **Android** | OpenXR, with the *Meta Quest* feature group (Meta XR Feature, Touch Controller Profile, Foveation, Subsampled Layout) | Standalone build on the headset |
+| **Standalone (Windows)** | Oculus | Play mode in the Editor through Quest Link / Air Link |
 
-Every project is different, so consider which of these sections apply to yours. The sections used in the template are suggestions for most open source projects. Also keep in mind that while a README can be too long and detailed, too long is better than too short. If you think your README is too long, consider utilizing another form of documentation rather than cutting out information.
+**Meta XR project config (`Assets/Oculus/OculusProjectConfig.asset`):** passthrough support, hand tracking (v2), spatial anchors and scene support are enabled.
 
-## Name
-Choose a self-explaining name for your project.
+---
 
-## Description
-Let people know what your project can do specifically. Provide context and add a link to any reference visitors might be unfamiliar with. A list of Features or a Background subsection can also be added here. If there are alternatives to your project, this is a good place to list differentiating factors.
+## Building for Meta Quest
 
-## Badges
-On some READMEs, you may see small images that convey metadata, such as whether or not all the tests are passing for the project. You can use Shields to add some to your README. Many services also have instructions for adding a badge.
+### Requirements
 
-## Visuals
-Depending on what you are making, it can be a good idea to include screenshots or even a video (you'll frequently see GIFs rather than actual videos). Tools like ttygif can help, but check out Asciinema for a more sophisticated method.
+- **Unity 6000.0.47f1** with the **Android Build Support** module (including OpenJDK and Android SDK & NDK Tools)
+- A **Meta Quest 3 / 3S** (Quest 2 and Pro also work but only show grayscale passthrough)
+- The headset in **Developer Mode** (enable it in the Meta Horizon app)
+- A USB-C cable, or Quest Link / Air Link for testing in the Editor
 
-## Installation
-Within a particular ecosystem, there may be a common way of installing things, such as using Yarn, NuGet, or Homebrew. However, consider the possibility that whoever is reading your README is a novice and would like more guidance. Listing specific steps helps remove ambiguity and gets people to using your project as quickly as possible. If it only runs in a specific context like a particular programming language version or operating system or has dependencies that have to be installed manually, also add a Requirements subsection.
+### Steps
 
-## Usage
-Use examples liberally, and show the expected output if you can. It's helpful to have inline the smallest example of usage that you can demonstrate, while providing links to more sophisticated examples if they are too long to reasonably include in the README.
+1. **Clone** the repository and open the `GhostbARsters/` folder in Unity Hub with Unity **6000.0.47f1**. The first import restores all packages from `Packages/manifest.json` and can take a while.
+2. Open **`Assets/Scenes/SampleScene.unity`**.
+3. **File → Build Profiles** (or *Build Settings*): select **Android** and click **Switch Platform**.
+4. Check **Edit → Project Settings → XR Plug-in Management → Android**: **OpenXR** must be enabled, and **Meta Quest Support** must be enabled under *OpenXR → Feature Groups*.
+5. Optionally run **Meta → Tools → Project Setup Tool** and click *Fix All* to apply any recommended Quest settings.
+6. Connect the Quest via USB and accept the *Allow USB debugging* prompt in the headset.
+7. In **Build Profiles**, select the headset under *Run Device* and click **Build And Run**. The APK is installed and started automatically.
+8. Later, you can launch the game from the headset's **Library → Unknown Sources**.
 
-## Support
-Tell people where they can go to for help. It can be any combination of an issue tracker, a chat room, an email address, etc.
+> **Tip:** For quick iteration, connect the headset with **Quest Link** and press Play in the Editor. The Oculus loader for the Standalone target is already configured for this.
 
-## Roadmap
-If you have ideas for releases in the future, it is a good idea to list them in the README.
+### Playing
 
-## Contributing
-State if you are open to contributions and what your requirements are for accepting them.
+- Play in a **darkened room** with enough **free floor space** (about 2 × 2 m or more). You'll be turning and moving around a lot.
+- Set up the **Guardian / boundary** before you start.
+- Ghosts and mushrooms start spawning about **10 seconds** after launch.
 
-For people who want to make changes to your project, it's helpful to have some documentation on how to get started. Perhaps there is a script that they should run or some environment variables that they need to set. Make these steps explicit. These instructions could also be useful to your future self.
+---
 
-You can also document commands to lint the code or run tests. These steps help to ensure high code quality and reduce the likelihood that the changes inadvertently break something. Having instructions for running tests is especially helpful if it requires external setup, such as starting a Selenium server for testing in a browser.
+## Credits
 
-## Authors and acknowledgment
-Show your appreciation to those who have contributed to the project.
+Developed as part of the course **Content Design**, summer semester 2025.
 
-## License
-For open source projects, say how it is licensed.
-
-## Project status
-If you have run out of energy or time for your project, put a note at the top of the README saying that development has slowed down or stopped completely. Someone may choose to fork your project or volunteer to step in as a maintainer or owner, allowing your project to keep going. You can also make an explicit request for maintainers.
+Built with Unity 6, the Meta XR SDK and the Unity XR Interaction Toolkit.
